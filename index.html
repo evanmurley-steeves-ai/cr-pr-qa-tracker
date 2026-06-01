@@ -245,24 +245,22 @@ function bdg(cls,txt){return '<span class="badge '+cls+'">'+txt+'</span>';}
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
 
 function buildPrompt(t,ag){
-return `You are a QA analyst for Flighthub's customer and partner relations team.
-
-TICKET CONTEXT:
-- Agent: ${ag.name} (${ag.team} team)
-- Ticket #: ${t.caseId}
-- Case type: ${t.type}
-- Ticket team: ${t.ticketTeam} (${t.ticketTeam==='PR'?'Partner Relations':'Customer Relations'})
-- Response time: ${t.rt} hours (SLA = 48h — ${t.rt<=48?'SLA MET':'SLA BREACHED'})
-- Resolution: ${t.resolution}
-
-Please score the email thread I will paste below across these 4 dimensions (0-100 each), with a 1-2 sentence comment for each, then give an Overall score (0-100) and a 2-3 sentence summary.
-
-1. Tone & Professionalism
-2. Accuracy & Completeness (for a ${t.type} case)
-3. SLA Compliance (response time was ${t.rt}h)
-4. Resolution Quality
-
----PASTE EMAIL THREAD BELOW THIS LINE---`;
+  var slaStatus = t.rt<=48 ? 'SLA MET' : 'SLA BREACHED';
+  var teamFull = t.ticketTeam==='PR' ? 'Partner Relations' : 'Customer Relations';
+  return 'You are a QA analyst for Flighthub customer and partner relations.\n\n' +
+    'TICKET CONTEXT:\n' +
+    '- Agent: ' + ag.name + ' (' + ag.team + ' team)\n' +
+    '- Ticket #: ' + t.caseId + '\n' +
+    '- Case type: ' + t.type + '\n' +
+    '- Ticket team: ' + t.ticketTeam + ' (' + teamFull + ')\n' +
+    '- Response time: ' + t.rt + ' hours (SLA = 48h - ' + slaStatus + ')\n' +
+    '- Resolution: ' + t.resolution + '\n\n' +
+    'Score the email thread I will paste below across 4 dimensions (0-100 each) with a 1-2 sentence comment for each, then give an Overall score (0-100) and a 2-3 sentence summary.\n\n' +
+    '1. Tone & Professionalism\n' +
+    '2. Accuracy & Completeness (for a ' + t.type + ' case)\n' +
+    '3. SLA Compliance (response time was ' + t.rt + 'h, SLA is 48h)\n' +
+    '4. Resolution Quality\n\n' +
+    '---PASTE EMAIL THREAD BELOW THIS LINE---';
 }
 
 function renderLB(){
