@@ -6,7 +6,7 @@
 <title>CR &amp; PR QA Tracker v5</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-<script src="data.js"></script>
+<script src="data.js" onload="initApp()"></script>
 <style>
 :root{--bg:#f5f4f0;--sur:#fff;--sur2:#eeede8;--bord:rgba(0,0,0,0.08);--bordm:rgba(0,0,0,0.13);--tx:#1a1917;--tx2:#6b6a66;--tx3:#9e9d99;--grn:#1a7a4a;--grnb:#e6f4ed;--amb:#8a5c00;--ambb:#fef3d7;--red:#9b2c2c;--redb:#fdeaea;--blu:#1a4fa0;--blub:#e8eefb;--pur:#5b3db5;--purb:#eeebfb}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -195,7 +195,6 @@ tr.hov:hover td{background:#faf9f6}
 </div></div>
 <div class="toast" id="toast"></div>
 <script>
-var D = window.TRACKER_DATA;
 var SLA = 48;
 var AGENTS = {
   "hend.hesham":   {name:"Hend Hesham",   team:"PR", ini:"HH", av:"at"},
@@ -203,11 +202,12 @@ var AGENTS = {
   "khaled.mostafa":{name:"Khaled Mostafa", team:"CR", ini:"KM", av:"ab"},
   "hossam.mohamed":{name:"Hossam Mohamed", team:"CR", ini:"HM", av:"ac"}
 };
-var MONTHLY = D.monthly;
-var MONTHS  = D.months;
-var RECENT  = D.recent;
-var BATCHES = D.batches;
-var MLABELS = MONTHS.map(function(m){var p=m.split("-");var names=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];return names[parseInt(p[1])-1]+" "+p[0];});
+var MONTHLY = {};
+var MONTHS  = [];
+var RECENT  = [];
+var BATCHES = {};
+var MLABELS = [];
+var _MLABELS_unused = MONTHS.map(function(m){var p=m.split("-");var names=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];return names[parseInt(p[1])-1]+" "+p[0];});
 
 var qaR={}, sampState={}, batchIdx={}, activeAg="hend.hesham", rvCtx=null, tChart=null;
 try{var s=localStorage.getItem("fh_qa_r");if(s)qaR=JSON.parse(s);}catch(e){}
@@ -460,9 +460,17 @@ function submitManual(){
 }
 document.getElementById("modal").addEventListener("click",function(e){if(e.target===this)closeModal();});
 
-renderLB();
-renderSC();
-renderAU();
+function initApp(){
+  var D = window.TRACKER_DATA;
+  MONTHLY = D.monthly;
+  MONTHS  = D.months;
+  RECENT  = D.recent;
+  BATCHES = D.batches;
+  MLABELS = MONTHS.map(function(m){var p=m.split("-");var names=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];return names[parseInt(p[1])-1]+" "+p[0];});
+  renderLB();
+  renderSC();
+  renderAU();
+}
 </script>
 </body>
 </html>
