@@ -103,8 +103,18 @@ tr.hov:hover td{background:#faf9f6}
       <button class="ni" onclick="sv('qs',this)">&#9654; QA Sample</button>
       <button class="ni" onclick="sv('tr',this)">&#9654; Trends</button>
     </nav>
-    <div class="sfooter">Apr-May 2026 · 3,160 tickets<br><span class="sla-badge">SLA = 48 hrs</span><br>
+    <div class="sfooter">
+      <div id="data-summary">Apr-May 2026 · 3,160 tickets</div>
+      <span class="sla-badge">SLA = 48 hrs</span><br>
       <div style="display:flex;gap:10px;margin-top:7px;font-size:11px"><span style="color:var(--pur)">&#9679; PR</span><span style="color:var(--blu)">&#9679; CR</span></div>
+      <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--bord)">
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--tx3);margin-bottom:6px">Update data</div>
+        <label for="csv-upload" style="display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:6px;border:.5px solid var(--bordm);background:var(--sur);cursor:pointer;font-size:11px;color:var(--tx2);transition:background .12s;" onmouseover="this.style.background='var(--sur2)'" onmouseout="this.style.background='var(--sur)'">
+          &#8593; Upload CSV export
+        </label>
+        <input type="file" id="csv-upload" accept=".csv" style="display:none" onchange="handleCSVUpload(event)">
+        <div id="upload-status" style="font-size:10px;margin-top:5px;color:var(--tx3)"></div>
+      </div>
     </div>
   </aside>
   <div class="main">
@@ -465,15 +475,135 @@ document.getElementById("modal").addEventListener("click",function(e){if(e.targe
 document.addEventListener("DOMContentLoaded", function(){ initApp(); });
 function initApp(){
   var D = window.TRACKER_DATA;
+  // Load base data
   MONTHLY = D.monthly;
   MONTHS  = D.months;
   RECENT  = D.recent;
   BATCHES = D.batches;
+  // Merge any previously uploaded CSV data from localStorage
+  try {
+    var lm = localStorage.getItem('fh_monthly');
+    var ln = localStorage.getItem('fh_months');
+    var lr = localStorage.getItem('fh_recent');
+    if (lm) { var saved = JSON.parse(lm); Object.keys(saved).forEach(function(k){ MONTHLY[k]=saved[k]; }); }
+    if (ln) { var sm = JSON.parse(ln); sm.forEach(function(m){ if(MONTHS.indexOf(m)===-1) MONTHS.push(m); }); MONTHS.sort(); }
+    if (lr) { var sr = JSON.parse(lr); var ex={}; RECENT.forEach(function(t){ex[t.caseId]=true;}); sr.forEach(function(t){if(!ex[t.caseId]){RECENT.push(t);ex[t.caseId]=true;}}); RECENT.sort(function(a,b){return b.date>a.date?1:-1;}); }
+  } catch(e) {}
   MLABELS = MONTHS.map(function(m){var p=m.split("-");var names=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];return names[parseInt(p[1])-1]+" "+p[0];});
   renderLB();
   renderSC();
   renderAU();
 }
+
+function handleCSVUpload(event) {
+  var file = event.target.files[0];
+  if (!file) return;
+  var status = document.getElementById('upload-status');
+  status.textContent = 'Reading file...';
+  status.style.color = 'var(--amb)';
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      var result = parseCSV(e.target.result);
+      if (result.error) { status.textContent = 'Error: ' + result.error; status.style.color = 'var(--red)'; return; }
+      mergeCSVData(result);
+      status.textContent = '+' + result.newCount + ' new tickets (' + result.total.toLocaleString() + ' total)';
+      status.style.color = 'var(--grn)';
+      document.getElementById('data-summary').textContent = result.dateRange + ' - ' + result.total.toLocaleString() + ' tickets';
+      renderLB(); renderSC(); renderAU();
+    } catch(err) { status.textContent = 'Error: ' + err.message; status.style.color = 'var(--red)'; }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+function parseCSVRow(line) {
+  var cols=[], cur='', inQ=false;
+  for (var i=0; i<line.length; i++) {
+    var c=line[i];
+    if (c==='"') { if(inQ&&line[i+1]==='"'){cur+='"';i++;}else{inQ=!inQ;} }
+    else if (c===','&&!inQ) { cols.push(cur); cur=''; }
+    else { cur+=c; }
+  }
+  cols.push(cur); return cols;
+}
+
+function classifyCase(srt, subj) {
+  if (srt==='Involuntary Exchange'||srt==='Voluntary Exchange') return 'Schedule Change';
+  if (srt==='Involuntary Refund'||srt==='Void'||srt==='Refund Investigation') return 'Refund';
+  if (srt==='Billing Inquiries') return 'Billing';
+  if (subj.indexOf('refund')>=0) return 'Refund';
+  if (subj.indexOf('kiwi')>=0) return 'KIWI Refund';
+  if (subj.indexOf('dot')>=0||subj.indexOf('oacp')>=0) return 'DOT';
+  if (subj.indexOf('cancel')>=0) return 'Schedule Change';
+  return 'General Info';
+}
+
+function parseCSV(text) {
+  var lines=text.split('\n');
+  if (lines.length<2) return {error:'File appears empty'};
+  var header=parseCSVRow(lines[0]);
+  var ci={};
+  header.forEach(function(h,i){ci[h.trim()]=i;});
+  var req=['Ticket Number','Assignee','Group','Status','Created At','Hours Between Creation and Resolution'];
+  for(var i=0;i<req.length;i++){if(ci[req[i]]===undefined)return{error:'Missing column: '+req[i]};}
+  var known=Object.keys(AGENTS), tickets=[], skipped=0;
+  for(var r=1;r<lines.length;r++){
+    var line=lines[r].trim(); if(!line)continue;
+    var cols=parseCSVRow(line);
+    var ak=(cols[ci['Assignee']]||'').trim();
+    if(known.indexOf(ak)===-1){skipped++;continue;}
+    var dateStr=(cols[ci['Created At']]||'').trim(); if(!dateStr)continue;
+    var rt=Math.max(0,parseInt((cols[ci['Hours Between Creation and Resolution']]||'0').trim())||0);
+    var status=(cols[ci['Status']]||'').trim().toLowerCase();
+    var group=(cols[ci['Group']]||'').trim().toUpperCase();
+    var srt=(cols[ci['Service Request Type']]||'').trim();
+    var subj=(cols[ci['Subject']]||'').trim().toLowerCase();
+    tickets.push({
+      date:dateStr.substring(0,10), caseId:(cols[ci['Ticket Number']]||'').trim(),
+      agentKey:ak, type:classifyCase(srt,subj),
+      ticketTeam:group.indexOf('PARTNER')>=0?'PR':'CR',
+      rt:rt, sla:rt<=SLA?'Yes':'No',
+      resolution:(status==='closed'||status==='solved')?'Resolved':'Pending'
+    });
+  }
+  return {tickets:tickets, skipped:skipped};
+}
+
+function mergeCSVData(result) {
+  var tickets=result.tickets;
+  var existing={};
+  RECENT.forEach(function(t){existing[t.caseId]=true;});
+  var newT=tickets.filter(function(t){return !existing[t.caseId];});
+  result.newCount=newT.length;
+  var merged=newT.concat(RECENT);
+  merged.sort(function(a,b){return b.date>a.date?1:-1;});
+  RECENT.length=0;
+  merged.slice(0,200).forEach(function(t){RECENT.push(t);});
+  newT.forEach(function(t){
+    var month=t.date.substring(0,7);
+    var key=t.agentKey+'|'+month;
+    if(!MONTHLY[key]){
+      MONTHLY[key]={cases:0,rt_sum:0,rt_count:0,sla:0,resolved:0,pr:0,cr:0};
+      if(MONTHS.indexOf(month)===-1){
+        MONTHS.push(month); MONTHS.sort();
+        MLABELS.length=0;
+        MONTHS.forEach(function(m){var p=m.split('-');var n=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];MLABELS.push(n[parseInt(p[1])-1]+' '+p[0]);});
+      }
+    }
+    var d=MONTHLY[key];
+    d.cases++;d.rt_sum+=t.rt;d.rt_count++;
+    if(t.rt<=SLA)d.sla++;
+    if(t.resolution==='Resolved')d.resolved++;
+    if(t.ticketTeam==='PR')d.pr++;else d.cr++;
+  });
+  var total=0; Object.values(MONTHLY).forEach(function(d){total+=d.cases;}); result.total=total;
+  var sm=MONTHS.slice().sort();
+  var fmt=function(m){var p=m.split('-');var n=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return n[parseInt(p[1])-1]+' '+p[0];};
+  result.dateRange=sm.length>=2?fmt(sm[0])+'-'+fmt(sm[sm.length-1]):(sm[0]||'');
+  try{localStorage.setItem('fh_monthly',JSON.stringify(MONTHLY));localStorage.setItem('fh_months',JSON.stringify(MONTHS));localStorage.setItem('fh_recent',JSON.stringify(RECENT.slice(0,80)));}catch(e){}
+}
+
 </script>
 </body>
 </html>
