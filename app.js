@@ -53,9 +53,9 @@ function allS(k){
 }
 function avEl(k,sz){
   sz=sz||27; var ag=AGENTS[k];
-  return '<span class="av '+ag.av+'" style="width:'+sz+'px;height:'+sz+'px;font-size:'+Math.round(sz*.38)+'px">'+ag.ini+'<\/span>';
+  return '<span class="av '+ag.av+'" style="width:'+sz+'px;height:'+sz+'px;font-size:'+Math.round(sz*.38)+'px">'+ag.ini+'</span>';
 }
-function bdg(cls,txt){ return '<span class="badge '+cls+'">'+txt+'<\/span>'; }
+function bdg(cls,txt){ return '<span class="badge '+cls+'">'+txt+'</span>'; }
 function toast(msg){
   var t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show");
   setTimeout(function(){ t.classList.remove("show"); },2400);
@@ -76,17 +76,17 @@ function renderLB(){
     var k=row.k,ag=row.ag,t=row.t;
     var s=allS(k); var avg=s.length?Math.round(s.reduce(function(a,r){return a+r.score;},0)/s.length):null;
     var qc=avg!=null
-      ?'<div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:'+avg+'%;background:'+scol(avg)+'"><\/div><\/div><span style="font-size:11px;font-weight:600;min-width:32px;color:'+scol(avg)+'">'+avg+'%<\/span><\/div>'
-      :'<span style="font-size:11px;color:#9e9d99">No scores yet<\/span>';
-    h+='<tr><td><span style="font-weight:600;font-size:13px;color:'+(i===0?"#c8961a":"#9e9d99")+'">'+(i+1)+'<\/span><\/td>'
-      +'<td><div class="acell">'+avEl(k)+'<div><div style="font-weight:500">'+ag.name+'<\/div><div style="font-size:10px;color:#9e9d99">'+ag.team+' agent<\/div><\/div><\/div><\/td>'
-      +'<td>'+bdg("bp",t.pr.toLocaleString())+'<\/td>'
-      +'<td>'+bdg("bb",t.cr.toLocaleString())+'<\/td>'
-      +'<td style="font-family:\'DM Mono\',monospace">'+t.cases.toLocaleString()+'<\/td>'
-      +'<td style="font-weight:500;color:'+rtcol(t.avgRt)+';font-family:\'DM Mono\',monospace">'+t.avgRt+'h<\/td>'
-      +'<td>'+bdg(sbcls(t.slaRate),t.slaRate+"%")+'<\/td>'
-      +'<td>'+bdg("bg",t.resRate+"%")+'<\/td>'
-      +'<td style="min-width:130px">'+qc+'<\/td><\/tr>';
+      ?'<div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:'+avg+'%;background:'+scol(avg)+'"></div></div><span style="font-size:11px;font-weight:600;min-width:32px;color:'+scol(avg)+'">'+avg+'%</span></div>'
+      :'<span style="font-size:11px;color:#9e9d99">No scores yet</span>';
+    h+='<tr><td><span style="font-weight:600;font-size:13px;color:'+(i===0?"#c8961a":"#9e9d99")+'">'+(i+1)+'</span></td>'
+      +'<td><div class="acell">'+avEl(k)+'<div><div style="font-weight:500">'+ag.name+'</div><div style="font-size:10px;color:#9e9d99">'+ag.team+' agent</div></div></div></td>'
+      +'<td>'+bdg("bp",t.pr.toLocaleString())+'</td>'
+      +'<td>'+bdg("bb",t.cr.toLocaleString())+'</td>'
+      +'<td style="font-family:\'DM Mono\',monospace">'+t.cases.toLocaleString()+'</td>'
+      +'<td style="font-weight:500;color:'+rtcol(t.avgRt)+';font-family:\'DM Mono\',monospace">'+t.avgRt+'h</td>'
+      +'<td>'+bdg(sbcls(t.slaRate),t.slaRate+"%")+'</td>'
+      +'<td>'+bdg("bg",t.resRate+"%")+'</td>'
+      +'<td style="min-width:130px">'+qc+'</td></tr>';
   });
   document.getElementById("lb-body").innerHTML=h;
 }
@@ -101,26 +101,26 @@ function renderSC(){
     var recHtml="";
     rec.forEach(function(r){
       recHtml+='<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:.5px solid rgba(0,0,0,0.08);font-size:12px">'
-        +'<span style="font-family:\'DM Mono\',monospace;color:#6b6a66">#'+r.caseId+'<\/span>'
+        +'<span style="font-family:\'DM Mono\',monospace;color:#6b6a66">#'+r.caseId+'</span>'
         +bdg(r.ticketTeam==="PR"?"bp":"bb",r.ticketTeam)
-        +'<span style="color:#9e9d99">'+r.type+'<\/span>'
-        +'<div style="display:flex;gap:5px;align-items:center"><span style="font-weight:500;color:'+rtcol(r.rt)+';font-family:\'DM Mono\',monospace">'+r.rt+'h<\/span>'+bdg(r.rt<=SLA?"bg":"br",r.rt<=SLA?"OK":"Late")+'<\/div>'
-        +'<\/div>';
+        +'<span style="color:#9e9d99">'+r.type+'</span>'
+        +'<div style="display:flex;gap:5px;align-items:center"><span style="font-weight:500;color:'+rtcol(r.rt)+';font-family:\'DM Mono\',monospace">'+r.rt+'h</span>'+bdg(r.rt<=SLA?"bg":"br",r.rt<=SLA?"OK":"Late")+'</div>'
+        +'</div>';
     });
     h+='<div class="scc">'
       +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">'
-      +'<div style="display:flex;align-items:center;gap:10px">'+avEl(k,36)+'<div><div style="font-size:14px;font-weight:500">'+ag.name+'<\/div><div style="font-size:10px;color:#9e9d99">'+ag.team+' - '+t.cases.toLocaleString()+' cases<\/div><\/div><\/div>'
-      +(avg!=null?bdg(bcls(avg),"QA "+avg+"%"):'<span style="font-size:10px;color:#9e9d99">No QA yet<\/span>')+'<\/div>'
+      +'<div style="display:flex;align-items:center;gap:10px">'+avEl(k,36)+'<div><div style="font-size:14px;font-weight:500">'+ag.name+'</div><div style="font-size:10px;color:#9e9d99">'+ag.team+' - '+t.cases.toLocaleString()+' cases</div></div></div>'
+      +(avg!=null?bdg(bcls(avg),"QA "+avg+"%"):'<span style="font-size:10px;color:#9e9d99">No QA yet</span>')+'</div>'
       +'<div class="sg">'
-      +'<div class="ss"><div class="ssv" style="color:'+rtcol(t.avgRt)+'">'+t.avgRt+'h<\/div><div class="ssl">Avg resp.<\/div><\/div>'
-      +'<div class="ss"><div class="ssv" style="color:'+(t.slaRate>=70?"#1a7a4a":t.slaRate>=50?"#8a5c00":"#9b2c2c")+'">'+t.slaRate+'%<\/div><div class="ssl">SLA<\/div><\/div>'
-      +'<div class="ss"><div class="ssv" style="color:#1a7a4a">'+t.resRate+'%<\/div><div class="ssl">Resolved<\/div><\/div>'
-      +'<\/div>'
+      +'<div class="ss"><div class="ssv" style="color:'+rtcol(t.avgRt)+'">'+t.avgRt+'h</div><div class="ssl">Avg resp.</div></div>'
+      +'<div class="ss"><div class="ssv" style="color:'+(t.slaRate>=70?"#1a7a4a":t.slaRate>=50?"#8a5c00":"#9b2c2c")+'">'+t.slaRate+'%</div><div class="ssl">SLA</div></div>'
+      +'<div class="ss"><div class="ssv" style="color:#1a7a4a">'+t.resRate+'%</div><div class="ssl">Resolved</div></div>'
+      +'</div>'
       +'<div style="margin-bottom:12px">'
-      +'<div style="display:flex;justify-content:space-between;font-size:10px;color:#9e9d99;margin-bottom:3px"><span style="color:#5b3db5">PR '+t.pr.toLocaleString()+' ('+pp+'%)<\/span><span style="color:#1a4fa0">CR '+t.cr.toLocaleString()+' ('+(100-pp)+'%)<\/span><\/div>'
-      +'<div class="split-bar"><div style="width:'+pp+'%;background:#5b3db5"><\/div><div style="width:'+(100-pp)+'%;background:#1a4fa0"><\/div><\/div><\/div>'
-      +'<div style="font-size:10px;font-weight:600;text-transform:uppercase;color:#9e9d99;margin-bottom:6px;letter-spacing:.04em">Recent tickets<\/div>'
-      +recHtml+'<\/div>';
+      +'<div style="display:flex;justify-content:space-between;font-size:10px;color:#9e9d99;margin-bottom:3px"><span style="color:#5b3db5">PR '+t.pr.toLocaleString()+' ('+pp+'%)</span><span style="color:#1a4fa0">CR '+t.cr.toLocaleString()+' ('+(100-pp)+'%)</span></div>'
+      +'<div class="split-bar"><div style="width:'+pp+'%;background:#5b3db5"></div><div style="width:'+(100-pp)+'%;background:#1a4fa0"></div></div></div>'
+      +'<div style="font-size:10px;font-weight:600;text-transform:uppercase;color:#9e9d99;margin-bottom:6px;letter-spacing:.04em">Recent tickets</div>'
+      +recHtml+'</div>';
   });
   document.getElementById("sc-cont").innerHTML=h;
 }
@@ -135,18 +135,18 @@ function renderAU(){
   }).slice(0,80).map(function(r){return Object.assign({},r,{score:(qaR[r.caseId]||{}).score});});
   var h=rows.map(function(r){
     var a=AGENTS[r.agentKey]; var ok=r.rt<=SLA;
-    return '<tr><td style="font-family:\'DM Mono\',monospace;font-size:10px;color:#9e9d99">'+r.date+'<\/td>'
-      +'<td style="font-family:\'DM Mono\',monospace;font-size:12px">#'+r.caseId+'<\/td>'
-      +'<td><div class="acell">'+avEl(r.agentKey,22)+a.name+'<\/div><\/td>'
-      +'<td>'+bdg(r.ticketTeam==="PR"?"bp":"bb",r.ticketTeam)+'<\/td>'
-      +'<td style="font-size:11px;color:#6b6a66">'+r.type+'<\/td>'
-      +'<td style="font-weight:500;color:'+rtcol(r.rt)+';font-family:\'DM Mono\',monospace">'+r.rt+'h<\/td>'
-      +'<td>'+bdg(ok?"bg":"br",ok?"Yes":"No")+'<\/td>'
-      +'<td>'+bdg("bg",r.resolution)+'<\/td>'
+    return '<tr><td style="font-family:\'DM Mono\',monospace;font-size:10px;color:#9e9d99">'+r.date+'</td>'
+      +'<td style="font-family:\'DM Mono\',monospace;font-size:12px">#'+r.caseId+'</td>'
+      +'<td><div class="acell">'+avEl(r.agentKey,22)+a.name+'</div></td>'
+      +'<td>'+bdg(r.ticketTeam==="PR"?"bp":"bb",r.ticketTeam)+'</td>'
+      +'<td style="font-size:11px;color:#6b6a66">'+r.type+'</td>'
+      +'<td style="font-weight:500;color:'+rtcol(r.rt)+';font-family:\'DM Mono\',monospace">'+r.rt+'h</td>'
+      +'<td>'+bdg(ok?"bg":"br",ok?"Yes":"No")+'</td>'
+      +'<td>'+bdg("bg",r.resolution)+'</td>'
       +'<td>'+(r.score!=null?bdg(bcls(r.score),r.score+"%")
-        :'<button onclick="quickScore(\''+r.caseId+'\',\''+r.agentKey+'\')" style="font-size:10px;padding:2px 8px;border-radius:999px;background:#eeede8;border:none;cursor:pointer;color:#6b6a66;font-family:\'DM Sans\',sans-serif">Score<\/button>')+'<\/td><\/tr>';
+        :'<button onclick="quickScore(\''+r.caseId+'\',\''+r.agentKey+'\')" style="font-size:10px;padding:2px 8px;border-radius:999px;background:#eeede8;border:none;cursor:pointer;color:#6b6a66;font-family:\'DM Sans\',sans-serif">Score</button>')+'</td></tr>';
   }).join("");
-  document.getElementById("au-body").innerHTML=h||'<tr><td colspan="9" style="text-align:center;padding:2rem;color:#9e9d99">No results<\/td><\/tr>';
+  document.getElementById("au-body").innerHTML=h||'<tr><td colspan="9" style="text-align:center;padding:2rem;color:#9e9d99">No results</td></tr>';
 }
 
 function initSamp(k){
@@ -160,7 +160,7 @@ function renderQSTabs(){
   var h="";
   Object.keys(AGENTS).forEach(function(k){
     var s=sampState[k]||[]; var d=s.filter(function(t){return t.finalScore!=null;}).length;
-    h+='<button class="agtab '+(k===activeAg?"active":"")+'" onclick="setAg(\''+k+'\')">'+avEl(k,19)+" "+AGENTS[k].name.split(" ")[0]+' <span style="font-size:9px;opacity:.7">'+d+"\/"+s.length+'<\/span>'+(d===s.length&&s.length>0?" V":"")+"<\/button>";
+    h+='<button class="agtab '+(k===activeAg?"active":"")+'" onclick="setAg(\''+k+'\')">'+avEl(k,19)+" "+AGENTS[k].name.split(" ")[0]+' <span style="font-size:9px;opacity:.7">'+d+"/"+s.length+'</span>'+(d===s.length&&s.length>0?" V":"")+"</button>";
   });
   document.getElementById("ag-tabs").innerHTML=h;
 }
@@ -169,15 +169,15 @@ function renderQSProg(){
   var h="";
   Object.keys(AGENTS).forEach(function(k){
     var s=sampState[k]||[]; var d=s.filter(function(t){return t.finalScore!=null;}).length;
-    var p=s.length?Math.round(d\/s.length*100):0;
+    var p=s.length?Math.round(d/s.length*100):0;
     var sc2=s.filter(function(t){return t.finalScore!=null;});
-    var avg=sc2.length?Math.round(sc2.reduce(function(a,t){return a+t.finalScore;},0)\/sc2.length):null;
+    var avg=sc2.length?Math.round(sc2.reduce(function(a,t){return a+t.finalScore;},0)/sc2.length):null;
     h+='<div style="display:flex;align-items:center;gap:10px;min-width:170px;flex:1">'+avEl(k,24)+'<div style="flex:1">'
       +'<div style="display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:3px">'
-      +'<span style="font-weight:500">'+AGENTS[k].name.split(" ")[0]+'<\/span>'
-      +'<span style="color:#9e9d99">'+d+"\/"+s.length+(avg!=null?' - <strong style="color:'+scol(avg)+'">'+avg+"%<\/strong>":"")+'<\/span><\/div>'
-      +'<div class="prog-bar-bg"><div class="prog-bar-fill" style="width:'+p+'%;background:'+(p===100?"#1a7a4a":"#8a5c00")+'"><\/div><\/div>'
-      +'<\/div><\/div>';
+      +'<span style="font-weight:500">'+AGENTS[k].name.split(" ")[0]+'</span>'
+      +'<span style="color:#9e9d99">'+d+"/"+s.length+(avg!=null?' - <strong style="color:'+scol(avg)+'">'+avg+"%</strong>":"")+'</span></div>'
+      +'<div class="prog-bar-bg"><div class="prog-bar-fill" style="width:'+p+'%;background:'+(p===100?"#1a7a4a":"#8a5c00")+'"></div></div>'
+      +'</div></div>';
   });
   document.getElementById("prog-card").innerHTML=h;
 }
@@ -202,22 +202,22 @@ function renderQSTable(){
     var ok=t.rt<=SLA; var hf=t.finalScore!=null;
     var isOpen=rvCtx&&rvCtx.agentKey===activeAg&&rvCtx.idx===i;
     var act=hf
-      ?'<div style="display:flex;gap:5px;align-items:center">'+bdg("bg","Done")+'<button onclick="openReview(\''+activeAg+'\','+i+')" style="font-size:10px;padding:2px 8px;border-radius:999px;background:#eeede8;border:none;cursor:pointer;color:#6b6a66;font-family:\'DM Sans\',sans-serif">Edit<\/button><\/div>'
-      :'<button onclick="openReview(\''+activeAg+'\','+i+')" style="font-size:11px;padding:4px 12px;border-radius:6px;background:'+(isOpen?"#1a1917":"#e8eefb")+';color:'+(isOpen?"#fff":"#1a4fa0")+';border:none;cursor:pointer;font-family:\'DM Sans\',sans-serif;font-weight:500">'+(isOpen?"Reviewing...":"Review with Claude")+"<\/button>";
+      ?'<div style="display:flex;gap:5px;align-items:center">'+bdg("bg","Done")+'<button onclick="openReview(\''+activeAg+'\','+i+')" style="font-size:10px;padding:2px 8px;border-radius:999px;background:#eeede8;border:none;cursor:pointer;color:#6b6a66;font-family:\'DM Sans\',sans-serif">Edit</button></div>'
+      :'<button onclick="openReview(\''+activeAg+'\','+i+')" style="font-size:11px;padding:4px 12px;border-radius:6px;background:'+(isOpen?"#1a1917":"#e8eefb")+';color:'+(isOpen?"#fff":"#1a4fa0")+';border:none;cursor:pointer;font-family:\'DM Sans\',sans-serif;font-weight:500">'+(isOpen?"Reviewing...":"Review with Claude")+"</button>";
     h+='<tr class="'+(hf?"srow-done":"srow-pend")+'">'
-      +'<td style="font-family:\'DM Mono\',monospace;font-size:10px;color:#9e9d99">'+t.date+'<\/td>'
-      +'<td style="font-family:\'DM Mono\',monospace;font-size:12px">#'+t.caseId+'<\/td>'
-      +'<td>'+bdg(t.ticketTeam==="PR"?"bp":"bb",t.ticketTeam)+'<\/td>'
-      +'<td style="font-size:11.5px;color:#6b6a66">'+t.type+'<\/td>'
-      +'<td style="font-weight:500;color:'+rtcol(t.rt)+';font-family:\'DM Mono\',monospace">'+t.rt+'h<\/td>'
-      +'<td>'+bdg(ok?"bg":"br",ok?"Yes":"No")+'<\/td>'
-      +'<td>'+(hf?bdg(bcls(t.finalScore),t.finalScore+"%"):'<span style="color:#9e9d99;font-size:11px">Pending<\/span>')+'<\/td>'
-      +'<td>'+act+'<\/td><\/tr>';
+      +'<td style="font-family:\'DM Mono\',monospace;font-size:10px;color:#9e9d99">'+t.date+'</td>'
+      +'<td style="font-family:\'DM Mono\',monospace;font-size:12px">#'+t.caseId+'</td>'
+      +'<td>'+bdg(t.ticketTeam==="PR"?"bp":"bb",t.ticketTeam)+'</td>'
+      +'<td style="font-size:11.5px;color:#6b6a66">'+t.type+'</td>'
+      +'<td style="font-weight:500;color:'+rtcol(t.rt)+';font-family:\'DM Mono\',monospace">'+t.rt+'h</td>'
+      +'<td>'+bdg(ok?"bg":"br",ok?"Yes":"No")+'</td>'
+      +'<td>'+(hf?bdg(bcls(t.finalScore),t.finalScore+"%"):'<span style="color:#9e9d99;font-size:11px">Pending</span>')+'</td>'
+      +'<td>'+act+'</td></tr>';
   });
   var done=samp.filter(function(t){return t.finalScore!=null;});
   if(done.length===samp.length&&samp.length>0){
-    var avg=Math.round(done.reduce(function(a,t){return a+t.finalScore;},0)\/done.length);
-    h+='<tr class="ssum"><td colspan="8"><strong>Batch complete<\/strong> - Avg QA: <strong style="color:'+scol(avg)+'">'+avg+'%<\/strong> - SLA met: '+samp.filter(function(t){return t.rt<=SLA;}).length+"\/"+samp.length+'<\/td><\/tr>';
+    var avg=Math.round(done.reduce(function(a,t){return a+t.finalScore;},0)/done.length);
+    h+='<tr class="ssum"><td colspan="8"><strong>Batch complete</strong> - Avg QA: <strong style="color:'+scol(avg)+'">'+avg+'%</strong> - SLA met: '+samp.filter(function(t){return t.rt<=SLA;}).length+"/"+samp.length+'</td></tr>';
   }
   document.getElementById("qs-body").innerHTML=h;
 }
@@ -225,7 +225,7 @@ function renderQSTable(){
 function openReview(agKey,idx){
   rvCtx={agentKey:agKey,idx:idx};
   var t=sampState[agKey][idx]; var ag=AGENTS[agKey];
-  document.getElementById("rv-meta").innerHTML='<strong style="font-size:13px">#'+t.caseId+'<\/strong>'+bdg(t.ticketTeam==="PR"?"bp":"bb",t.ticketTeam)+'<span style="font-size:12px;color:#6b6a66">'+t.type+'<\/span><span style="font-size:12px;font-weight:500;color:'+rtcol(t.rt)+'">'+t.rt+'h<\/span>'+bdg(t.rt<=SLA?"bg":"br","SLA "+(t.rt<=SLA?"OK":"Late"))+'<span style="font-size:12px;color:#9e9d99">'+ag.name+'<\/span>';
+  document.getElementById("rv-meta").innerHTML='<strong style="font-size:13px">#'+t.caseId+'</strong>'+bdg(t.ticketTeam==="PR"?"bp":"bb",t.ticketTeam)+'<span style="font-size:12px;color:#6b6a66">'+t.type+'</span><span style="font-size:12px;font-weight:500;color:'+rtcol(t.rt)+'">'+t.rt+'h</span>'+bdg(t.rt<=SLA?"bg":"br","SLA "+(t.rt<=SLA?"OK":"Late"))+'<span style="font-size:12px;color:#9e9d99">'+ag.name+'</span>';
   document.getElementById("rv-prompt").textContent=buildPrompt(t,ag);
   document.getElementById("final-inp").value=t.finalScore!=null?t.finalScore:"";
   var panel=document.getElementById("rv-panel"); panel.classList.add("open");
@@ -259,8 +259,8 @@ function renderTR(){
   var datasets=keys.map(function(k,i){
     var data=MONTHS.map(function(m){
       var d=MONTHLY[k+"|"+m]; if(!d||d.cases<2) return null;
-      if(mt==="rt") return d.rt_count?Math.round(d.rt_sum\/d.rt_count):null;
-      if(mt==="sla") return d.cases?Math.round(d.sla\/d.cases*100):null;
+      if(mt==="rt") return d.rt_count?Math.round(d.rt_sum/d.rt_count):null;
+      if(mt==="sla") return d.cases?Math.round(d.sla/d.cases*100):null;
       return d.cases;
     });
     return{label:AGENTS[k].name.split(" ")[0],data:data,borderColor:colors[i],backgroundColor:colors[i]+"18",tension:.3,pointRadius:5,fill:keys.length===1,borderWidth:2};
